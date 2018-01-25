@@ -5,7 +5,8 @@ region = "ap-southeast-1"
 
 vpc_id = "vpc-efafea"
 subnet_id = "subnet-aefafefaef"
-instance_type = "t2.micro"
+# NOTE: micro will not be efficient to run Jenkins
+# instance_type = "t2.micro"
 key_name = "devops-tf"
 
 s3_bucket = "faffef"
