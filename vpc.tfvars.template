@@ -1,0 +1,11 @@
+# Your variables for exisiting vpc
+access_key = "abcefefefe"
+secret_key = "efeafvcsvfrgwge"
+region = "ap-southeast-1"
+
+vpc_id = "vpc-efafea"
+subnet_id = "subnet-aefafefaef"
+instance_type = "t2.micro"
+key_name = "devops-tf"
+
+s3_bucket = "faffef"

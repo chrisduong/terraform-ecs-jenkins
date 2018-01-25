@@ -8,14 +8,20 @@ The terraform script stores the terraform state remotely in an S3 bucket. The Ma
 
 ## Usage
 
+**WARN:** This implementation expect a `vpc.tfvars` for describing your own VPC settings using variable `VPC_TFVARS`.
+
 ### Provision Jenkins in ECS
 
 Run `make apply` from the project's root directory.
 
 Before you run the Makefile, you should set the following environment variables to authenticate with AWS:
+
+This is for Initializing your backend S3.
+
 ```
 $ export AWS_ACCESS_KEY_ID= <your key> # to store and retrieve the remote state in s3.
 $ export AWS_SECRET_ACCESS_KEY= <your secret>
+$ export STATEBUCKET= <your s3 bucket>
 $ export AWS_DEFAULT_REGION= <your bucket region e.g. us-west-2>
 $ export TF_VAR_access_key=$AWS_ACCESS_KEY # exposed as access_key in terraform scripts
 $ export TF_VAR_secret_key=$AWS_SECRET_ACCESS_KEY # exposed as secret_key in terraform scripts

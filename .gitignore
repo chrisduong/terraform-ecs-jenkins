@@ -1,5 +1,12 @@
-.idea/
+#  Local .terraform directories
+**/.terraform/*
 
-terraform.tfstate
-terraform.tfstate.backup
+# .tfstate files
+*.tfstate
+*.tfstate.*
 
+# .tfvars files
+*.tfvars
+
+# Init file trick
+init.txt

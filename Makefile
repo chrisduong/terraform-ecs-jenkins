@@ -11,8 +11,16 @@
 
 # ####################################################
 #
-STATEBUCKET = mycompany-terraform
 PREFIX = jenkins
+AWS_DEFAULT_REGION = ap-southeast-1
+
+ifndef STATEBUCKET
+$(error STATEBUCKET is not set)
+endif
+
+ifndef VPC_TFVARS
+$(error VPC_TFVARS is not set)
+endif
 
 # # Before we start test that we have the mandatory executables available
 	EXECUTABLES = git terraform
@@ -21,7 +29,6 @@ PREFIX = jenkins
 #
 #     .PHONY: all s3bucket plan
 
-
 .PHONY: all plan apply
 
 all: init.txt plan
@@ -29,11 +36,11 @@ all: init.txt plan
 
 plan:
 	@echo "running terraform plan"
-	terraform plan
+	terraform plan -var-file=$(VPC_TFVARS)
 
 apply:
 	@echo running terraform apply
-	terraform apply
+	terraform apply -var-file=$(VPC_TFVARS)
 
 destroy:
 	@echo running terraform destroy
@@ -43,5 +50,10 @@ destroy:
 # for second nested Makefile
 init.txt:
 	@echo "initialize remote state file"
-	terraform remote config -backend=s3 -backend-config="bucket=$(STATEBUCKET)" -backend-config="key=$(PREFIX)/terraform.tfstate"
-	echo "ran terraform remote config -backend=s3 -backend-config=\"bucket=$(STATEBUCKET)\" -backend-config=\"key=$(PREFIX)/terraform.tfstate\"" > ./init.txt
+	terraform init \
+		-backend-config="access_key=$(AWS_ACCESS_KEY_ID)" \
+		-backend-config="secret_key=$(AWS_SECRET_ACCESS_KEY)" \
+		-backend-config="bucket=$(STATEBUCKET)" \
+		-backend-config="key=$(PREFIX)/terraform.tfstate" \
+		-backend-config="region=$(AWS_DEFAULT_REGION)"
+	echo "Initialization done" > ./init.txt

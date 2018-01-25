@@ -11,9 +11,18 @@ variable "region" {
   default = "us-east-1"
 }
 
+# NOTE: Availablility zone is not needed for this scenario.
 variable "availability_zone" {
   description = "The availability zone"
-  default = "us-east-1b"
+  default = ""
+}
+
+variable "vpc_id" {
+  description = "The VPC id"
+}
+
+variable "subnet_id" {
+  description = "The Subnet id"
 }
 
 variable "ecs_cluster_name" {
