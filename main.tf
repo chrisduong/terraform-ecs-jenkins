@@ -1,66 +1,27 @@
+# This template is for existing VPC
 provider "aws" {
   access_key = "${var.access_key}"
   secret_key = "${var.secret_key}"
   region = "${var.region}"
 }
 
+terraform {
+  backend "s3" {}
+}
+
 data "terraform_remote_state" "tfstate" {
   backend = "s3"
   config {
-    bucket = "mycompany-terraform"
+    bucket = "${var.s3_bucket}"
     key = "jenkins/terraform.tfstate"
-    region = "us-east-1"
-  }
-}
-
-resource "aws_vpc" "jenkins" {
-  cidr_block = "10.0.0.0/16"
-  enable_dns_hostnames = true
-
-  tags {
-    for = "${var.ecs_cluster_name}"
-  }
-}
-
-resource "aws_route_table" "external" {
-  vpc_id = "${aws_vpc.jenkins.id}"
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = "${aws_internet_gateway.jenkins.id}"
-  }
-
-  tags {
-    for = "${var.ecs_cluster_name}"
-  }
-}
-
-resource "aws_route_table_association" "external-jenkins" {
-  subnet_id = "${aws_subnet.jenkins.id}"
-  route_table_id = "${aws_route_table.external.id}"
-}
-
-resource "aws_subnet" "jenkins" {
-  vpc_id = "${aws_vpc.jenkins.id}"
-  cidr_block = "10.0.1.0/24"
-  availability_zone = "${var.availability_zone}"
-
-  tags {
-    for = "${var.ecs_cluster_name}"
-  }
-}
-
-resource "aws_internet_gateway" "jenkins" {
-  vpc_id = "${aws_vpc.jenkins.id}"
-
-  tags {
-    for = "${var.ecs_cluster_name}"
+    region = "${var.region}"
   }
 }
 
 resource "aws_security_group" "sg_jenkins" {
   name = "sg_${var.ecs_cluster_name}"
-  description = "Allows all traffic"
-  vpc_id = "${aws_vpc.jenkins.id}"
+  description = "Allows all traffic for testing"
+  vpc_id = "${var.vpc_id}"
 
   ingress {
     from_port = 22
@@ -116,7 +77,7 @@ resource "aws_autoscaling_group" "asg_jenkins" {
   health_check_type = "EC2"
   health_check_grace_period = 300
   launch_configuration = "${aws_launch_configuration.lc_jenkins.name}"
-  vpc_zone_identifier = ["${aws_subnet.jenkins.id}"]
+  vpc_zone_identifier = ["${var.subnet_id}"]
 
   lifecycle {
     create_before_destroy = true
